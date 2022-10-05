@@ -1,5 +1,7 @@
 import {
   CacheInterceptor,
+  CacheKey,
+  CacheTTL,
   Controller,
   Get,
   Param,
@@ -11,9 +13,12 @@ import { PokemonService } from './pokemon.service';
 export class PokemonController {
   constructor(private readonly service: PokemonService) {}
 
-  @UseInterceptors(CacheInterceptor)
   @Get('/:id')
+  @CacheKey('auto-caching-fake-model')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(100)
   async getPokemon(@Param('id') id: number): Promise<string> {
+    console.log('Vine aqui');
     return await this.service.getPokemon(+id);
   }
 }

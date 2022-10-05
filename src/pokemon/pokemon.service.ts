@@ -11,19 +11,29 @@ export class PokemonService {
 
   async getPokemon(id: number): Promise<string> {
     // check if data is in cache:
-    const cachedData = await this.cacheService.get<{ name: string }>(
-      id.toString(),
+    const cachedData = await this.cacheService.get<any>(
+      'auto-caching-fake-model',
     );
     if (cachedData) {
       console.log(`Getting data from cache!`);
-      return `${cachedData.name}`;
+      return cachedData;
     }
 
     // if not, call API and set the cache:
     const { data } = await this.httpService.axiosRef.get(
-      `https://pokeapi.co/api/v2/pokemon/${id}`,
+      `https://pokeapi.co/api/v2/pokemon/`,
     );
-    await this.cacheService.set(id.toString(), data);
-    return await `${data.name}`;
+    for( let iterar = 0; iterar<40; iterar ++ ){
+      await this.httpService.axiosRef.get(
+        `https://pokeapi.co/api/v2/pokemon/`,
+      );
+    }
+    await this.cacheService.set('auto-caching-fake-model', data.results);
+    const response =  data.results.map( (item) => {
+      return {
+        name: item.name
+      };
+    });
+    return response;
   }
 }
